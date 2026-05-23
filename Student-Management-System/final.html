@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Library Management System</title>
+    <link rel="stylesheet" href="styles-new.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 10000;">
+        <div style="background: white; padding: 2rem; border-radius: 12px; text-align: center;">
+            <div class="spinner"></div>
+            <p style="margin-top: 1rem; color: var(--text-primary); font-family: 'Inter', sans-serif;">Loading Student Management System...</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Academic Library</h1>
+                        <span class="tagline">Student Management System</span>
+                    </div>
+                </div>
+                <nav class="nav">
+                    <button class="nav-btn active" data-page="dashboard">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button class="nav-btn" data-page="students">
+                        <i class="fas fa-users"></i>
+                        <span>Students</span>
+                    </button>
+                    <button class="nav-btn" data-page="monthly-payments">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Monthly Payments</span>
+                    </button>
+                    <button class="nav-btn" data-page="register">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Register</span>
+                    </button>
+                    <button class="nav-btn" data-page="admin">
+                        <i class="fas fa-cog"></i>
+                        <span>Admin</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Dashboard Page -->
+            <section id="dashboard" class="page active">
+                <div class="page-header">
+                    <div class="header-left">
+                        <h2 class="page-title">Dashboard Overview</h2>
+                        <p class="page-subtitle">Welcome to Academic Library Management System</p>
+                    </div>
+                    <div class="header-right">
+                        <div class="date-display">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span id="current-date"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card primary">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-students" class="stat-number">0</h3>
+                            <p class="stat-label">Total Students</p>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Active</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card secondary">
+                        <div class="stat-icon">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-desks" class="stat-number">0</h3>
+                            <p class="stat-label">Assigned Desks</p>
+                            <div class="stat-change neutral">
+                                <i class="fas fa-equals"></i>
+                                <span>Occupied</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-icon">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-revenue" class="stat-number">₹0</h3>
+                            <p class="stat-label">Total Revenue</p>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Generated</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card accent">
+                        <div class="stat-icon">
+                            <i class="fas fa-tag"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="desk-charge" class="stat-number">₹500</h3>
+                            <p class="stat-label">Desk Charge</p>
+                            <div class="stat-change neutral">
+                                <i class="fas fa-sync"></i>
+                                <span>Per Month</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-section">
+                    <div class="section-header">
+                        <h3>Recent Students</h3>
+                        <button class="btn-view-all" onclick="sms.switchPage('students')">
+                            View All <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div id="recent-students" class="recent-list">
+                        <!-- Recent students will be displayed here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Students Page -->
+            <section id="students" class="page">
+                <div class="page-header">
+                    <div class="header-left">
+                        <h2 class="page-title">Student Directory</h2>
+                        <p class="page-subtitle">Click on student name to view detailed information</p>
+                    </div>
+                    <div class="header-right">
+                        <div class="search-container">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="search-input" placeholder="Search students by name, email, or desk...">
+                            <button id="clear-search" class="btn-clear">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="students-directory">
+                    <div id="students-list" class="students-grid">
+                        <!-- Students will be dynamically added here -->
+                    </div>
+                    <div id="no-students" class="no-data">
+                        <div class="no-data-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h3>No Students Found</h3>
+                        <p>No students have been registered yet. Start by registering your first student.</p>
+                        <button class="btn-primary" onclick="sms.switchPage('register')">
+                            <i class="fas fa-user-plus"></i> Register First Student
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Monthly Payments Page -->
+            <section id="monthly-payments" class="page">
+                <div class="page-header">
+                    <div class="header-left">
+                        <h2 class="page-title">Monthly Payment Report</h2>
+                        <p class="page-subtitle">View all payments received in current month</p>
+                    </div>
+                    <div class="header-right">
+                        <div class="month-selector">
+                            <select id="payment-month">
+                                <!-- Month options will be populated dynamically -->
+                            </select>
+                            <select id="payment-year">
+                                <!-- Year options will be populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-summary">
+                    <div class="summary-card">
+                        <h3>Monthly Summary</h3>
+                        <div class="summary-stats">
+                            <div class="summary-item">
+                                <span class="summary-label">Total Payments:</span>
+                                <span id="monthly-total-payments" class="summary-value">0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Total Amount:</span>
+                                <span id="monthly-total-amount" class="summary-value">₹0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Unique Students:</span>
+                                <span id="monthly-unique-students" class="summary-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payments-table-container">
+                    <table class="payments-table">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Desk Number</th>
+                                <th>Amount</th>
+                                <th>Payment Method</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monthly-payments-list">
+                            <!-- Monthly payments will be displayed here -->
+                        </tbody>
+                    </table>
+                    <div id="no-monthly-payments" class="no-data">
+                        <div class="no-data-icon">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <h3>No Payments This Month</h3>
+                        <p>No payments have been recorded for selected month.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Register Student Page -->
+            <section id="register" class="page">
+                <div class="page-header">
+                    <div class="header-left">
+                        <h2 class="page-title">Register New Student</h2>
+                        <p class="page-subtitle">Enroll a new student in library system</p>
+                    </div>
+                </div>
+
+                <div class="form-container">
+                    <form id="student-form" class="modern-form">
+                        <div class="form-section">
+                            <h3 class="section-title">Personal Information</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="student-name">Full Name *</label>
+                                    <input type="text" id="student-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="student-contact">Contact Number *</label>
+                                    <input type="tel" id="student-contact" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="student-email">Email Address *</label>
+                                    <input type="email" id="student-email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="student-address">Address *</label>
+                                    <input type="text" id="student-address" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3 class="section-title">Academic Information</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="field-study">Field of Study *</label>
+                                    <select id="field-study" required>
+                                        <option value="">Select Field</option>
+                                        <option value="Computer Science">Computer Science</option>
+                                        <option value="Engineering">Engineering</option>
+                                        <option value="Medicine">Medicine</option>
+                                        <option value="Business">Business</option>
+                                        <option value="Arts">Arts</option>
+                                        <option value="Science">Science</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="desk-number">Desk Number *</label>
+                                    <input type="text" id="desk-number" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save"></i> Register Student
+                            </button>
+                            <button type="reset" class="btn-secondary">
+                                <i class="fas fa-redo"></i> Reset Form
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Student Detail Page -->
+            <section id="student-detail" class="page">
+                <div class="page-header">
+                    <button class="btn-back" onclick="sms.switchPage('students')">
+                        <i class="fas fa-arrow-left"></i> Back to Students
+                    </button>
+                    <div class="header-left">
+                        <h2 class="page-title" id="student-detail-name">Student Details</h2>
+                        <p class="page-subtitle">Complete student information and payment history</p>
+                    </div>
+                </div>
+
+                <div class="student-detail-container">
+                    <div class="student-info-card">
+                        <h3>Personal Information</h3>
+                        <div id="student-details" class="detail-grid">
+                            <!-- Student details will be dynamically added here -->
+                        </div>
+                    </div>
+
+                    <div class="payment-card">
+                        <h3>Payment Records</h3>
+                        <div id="payment-list" class="payment-list">
+                            <!-- Payment records will be dynamically added here -->
+                        </div>
+                        <div id="no-payments" class="no-data">
+                            <div class="no-data-icon">
+                                <i class="fas fa-receipt"></i>
+                            </div>
+                            <h3>No Payment Records</h3>
+                            <p>This student hasn't made any payments yet.</p>
+                        </div>
+                        
+                        <div class="add-payment-section">
+                            <h4>Add New Payment</h4>
+                            <form id="payment-form" class="payment-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="payment-amount">Amount (₹)</label>
+                                        <input type="number" id="payment-amount" min="0" step="50" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="payment-date">Date</label>
+                                        <input type="date" id="payment-date" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="payment-method">Method</label>
+                                        <select id="payment-method" required>
+                                            <option value="">Select Method</option>
+                                            <option value="Cash">Cash</option>
+                                            <option value="Card">Card</option>
+                                            <option value="Online">Online Transfer</option>
+                                            <option value="Check">Check</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-primary">
+                                    <i class="fas fa-plus"></i> Add Payment
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Panel Page -->
+            <section id="admin" class="page">
+                <div class="page-header">
+                    <div class="header-left">
+                        <h2 class="page-title">Admin Panel</h2>
+                        <p class="page-subtitle">System configuration and data management</p>
+                    </div>
+                </div>
+
+                <div class="admin-grid">
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <i class="fas fa-rupee-sign"></i>
+                            <h3>Desk Charge Settings</h3>
+                        </div>
+                        <form id="desk-charge-form" class="admin-form">
+                            <div class="form-group">
+                                <label for="current-charge">Current Desk Charge</label>
+                                <div class="input-group">
+                                    <span class="input-prefix">₹</span>
+                                    <input type="number" id="current-charge" min="0" step="50" value="500">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save"></i> Update Charge
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <i class="fas fa-database"></i>
+                            <h3>Data Management</h3>
+                        </div>
+                        <div class="admin-actions">
+                            <button id="export-data" class="btn-secondary">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                            <button id="clear-all-data" class="btn-danger">
+                                <i class="fas fa-trash"></i> Clear All Data
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-bar"></i>
+                            <h3>System Status</h3>
+                        </div>
+                        <div class="system-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Total Registered:</span>
+                                <span id="admin-total-students" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Active Desks:</span>
+                                <span id="admin-active-desks" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">This Month Revenue:</span>
+                                <span id="admin-monthly-revenue" class="stat-value">₹0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Connection Status:</span>
+                                <span id="connection-status" class="stat-value">Checking...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Success/Error Messages -->
+    <div id="message" class="message"></div>
+
+    <!-- JavaScript -->
+    <script src="final-script.js"></script>
+</body>
+</html>

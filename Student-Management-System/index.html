@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System - Library</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-book-open"></i>
+                    <h1>Library Student Management</h1>
+                </div>
+                <nav class="nav">
+                    <button class="nav-btn active" data-page="dashboard">
+                        <i class="fas fa-dashboard"></i> Dashboard
+                    </button>
+                    <button class="nav-btn" data-page="register">
+                        <i class="fas fa-user-plus"></i> Register Student
+                    </button>
+                    <button class="nav-btn" data-page="admin">
+                        <i class="fas fa-cog"></i> Admin Panel
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Dashboard Page -->
+            <section id="dashboard" class="page active">
+                <div class="page-header">
+                    <h2>Student Dashboard</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-students">0</h3>
+                                <p>Total Students</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-desktop"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-desks">0</h3>
+                                <p>Assigned Desks</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-revenue">₹0</h3>
+                                <p>Total Revenue</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-tag"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="desk-charge">₹500</h3>
+                                <p>Desk Charge</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="search-section">
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-input" placeholder="Search students by name, email, or desk number...">
+                        <button id="clear-search" class="btn-clear">Clear</button>
+                    </div>
+                </div>
+
+                <div class="students-section">
+                    <h3>Registered Students</h3>
+                    <div id="students-list" class="students-grid">
+                        <!-- Students will be dynamically added here -->
+                    </div>
+                    <div id="no-students" class="no-data">
+                        <i class="fas fa-user-graduate"></i>
+                        <p>No students registered yet</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Register Student Page -->
+            <section id="register" class="page">
+                <div class="page-header">
+                    <h2>Register New Student</h2>
+                    <p>Fill in the student information to register for library desk access</p>
+                </div>
+
+                <form id="student-form" class="form-container">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="student-name">Full Name *</label>
+                            <input type="text" id="student-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="student-contact">Contact Number *</label>
+                            <input type="tel" id="student-contact" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="student-email">Email Address *</label>
+                            <input type="email" id="student-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="student-address">Address *</label>
+                            <input type="text" id="student-address" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="field-study">Field of Study *</label>
+                            <select id="field-study" required>
+                                <option value="">Select Field</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Engineering">Engineering</option>
+                                <option value="Medicine">Medicine</option>
+                                <option value="Business">Business</option>
+                                <option value="Arts">Arts</option>
+                                <option value="Science">Science</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="desk-number">Desk Number *</label>
+                            <input type="text" id="desk-number" required>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save"></i> Register Student
+                        </button>
+                        <button type="reset" class="btn-secondary">
+                            <i class="fas fa-redo"></i> Reset Form
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Admin Panel Page -->
+            <section id="admin" class="page">
+                <div class="page-header">
+                    <h2>Admin Panel</h2>
+                    <p>Manage system settings and desk charges</p>
+                </div>
+
+                <div class="admin-grid">
+                    <div class="admin-card">
+                        <h3><i class="fas fa-money-bill-wave"></i> Desk Charge Settings</h3>
+                        <form id="desk-charge-form">
+                            <div class="form-group">
+                                <label for="current-charge">Current Desk Charge</label>
+                                <div class="input-group">
+                                    <span class="input-prefix">₹</span>
+                                    <input type="number" id="current-charge" min="0" step="50" value="500">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save"></i> Update Charge
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="admin-card">
+                        <h3><i class="fas fa-trash-alt"></i> Data Management</h3>
+                        <div class="admin-actions">
+                            <button id="export-data" class="btn-secondary">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                            <button id="clear-all-data" class="btn-danger">
+                                <i class="fas fa-trash"></i> Clear All Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Student Details Modal -->
+    <div id="student-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Student Details</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="student-details">
+                    <!-- Student details will be dynamically added here -->
+                </div>
+                
+                <div class="payment-section">
+                    <h4>Payment Records</h4>
+                    <div id="payment-list">
+                        <!-- Payment records will be dynamically added here -->
+                    </div>
+                    <div id="no-payments" class="no-data">
+                        <i class="fas fa-receipt"></i>
+                        <p>No payment records found</p>
+                    </div>
+                    
+                    <div class="add-payment">
+                        <h5>Add New Payment</h5>
+                        <form id="payment-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="payment-amount">Amount (₹)</label>
+                                    <input type="number" id="payment-amount" min="0" step="50" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="payment-date">Date</label>
+                                    <input type="date" id="payment-date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="payment-method">Method</label>
+                                    <select id="payment-method" required>
+                                        <option value="">Select Method</option>
+                                        <option value="Cash">Cash</option>
+                                        <option value="Card">Card</option>
+                                        <option value="Online">Online Transfer</option>
+                                        <option value="Check">Check</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-plus"></i> Add Payment
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="message" class="message"></div>
+
+    <!-- JavaScript -->
+    <script src="script-google-sheets.js"></script>
+</body>
+</html>

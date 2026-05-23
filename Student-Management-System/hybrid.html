@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hybrid Student Management System</title>
+    <link rel="stylesheet" href="styles-new.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        .sync-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-block;
+            margin: 0.5rem 0;
+        }
+        .sync-status.online {
+            background: #10b981;
+            color: white;
+        }
+        .sync-status.offline {
+            background: #f59e0b;
+            color: white;
+        }
+        .hybrid-controls {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            box-shadow: var(--shadow-md);
+        }
+        .hybrid-controls h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        .storage-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .storage-card {
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .storage-card.local {
+            background: #e0f2fe;
+            border: 2px solid #0284c7;
+        }
+        .storage-card.cloud {
+            background: #f0fdf4;
+            border: 2px solid #16a34a;
+        }
+        .storage-card h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--primary-color);
+        }
+        .storage-card p {
+            margin: 0;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        .payment-table-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+        }
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .table-header h3 {
+            color: var(--primary-color);
+            margin: 0;
+        }
+        .table-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .payment-dashboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+        .payment-dashboard-table th {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+        .payment-dashboard-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        .payment-dashboard-table tr:hover {
+            background: var(--light-bg);
+        }
+        .payment-dashboard-table tr:last-child td {
+            border-bottom: none;
+        }
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border-radius: 6px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+            box-shadow: var(--shadow-xl);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .modal-header h3 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+        .modal-close:hover {
+            background: var(--light-bg);
+        }
+        .modal-body {
+            padding: 2rem;
+        }
+        .payment-history-table {
+            margin: 1rem 0;
+        }
+        .payment-history-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .payment-history-table th,
+        .payment-history-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .payment-history-table th {
+            background: var(--light-bg);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        .payment-month-indicator {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+        }
+        .payment-month-indicator i {
+            font-size: 1.25rem;
+        }
+        .payment-month-indicator strong {
+            font-weight: 700;
+        }
+        .payment-amount {
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            display: block;
+        }
+        .payment-amount.has-payment {
+            color: #16a34a;
+        }
+        .payment-amount.no-payment {
+            color: #6b7280;
+        }
+        .payment-date {
+            color: #6b7280;
+            font-size: 0.75rem;
+            font-weight: 400;
+        }
+        .payment-method {
+            display: inline-block;
+            background: #3182ce;
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.25rem;
+        }
+        .student-detail-modal {
+            max-width: 900px;
+            width: 95%;
+        }
+        .student-detail-grid {
+            display: grid;
+            gap: 2rem;
+        }
+        .detail-section {
+            background: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-color);
+        }
+        .detail-section h4 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        .detail-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .payment-summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .payment-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .payment-card.total {
+            border-top: 3px solid var(--success-color);
+        }
+        .payment-card.count {
+            border-top: 3px solid var(--accent-color);
+        }
+        .payment-card.latest {
+            border-top: 3px solid var(--warning-color);
+        }
+        .payment-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .payment-card-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .payment-method-badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+            display: inline-block;
+        }
+        .payment-history-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .payment-record {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .payment-amount {
+            font-weight: 700;
+            color: var(--success-color);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .payment-details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.25rem;
+        }
+        .payment-date {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        .payment-method {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .no-payments {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            background: var(--card-bg);
+            border-radius: 8px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        .click-hint {
+            color: var(--accent-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .student-card:hover .click-hint {
+            opacity: 1;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-cloud"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Hybrid System</h1>
+                        <span class="tagline">Dual Storage Management</span>
+                    </div>
+                </div>
+                <nav class="nav">
+                    <button class="nav-btn active" data-page="dashboard">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button class="nav-btn" data-page="students">
+                        <i class="fas fa-users"></i>
+                        <span>Students</span>
+                    </button>
+                    <button class="nav-btn" data-page="payment-table">
+                        <i class="fas fa-table"></i>
+                        <span>Payment Table</span>
+                    </button>
+                    <button class="nav-btn" data-page="register">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Register</span>
+                    </button>
+                    <button class="nav-btn" data-page="admin">
+                        <i class="fas fa-cog"></i>
+                        <span>Admin</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Dashboard Page -->
+            <section id="dashboard" class="page active">
+                <div class="page-header">
+                    <div class="header-left">
+                        <h2 class="page-title">Hybrid Dashboard</h2>
+                        <p class="page-subtitle">Dual Storage System - Local + Cloud</p>
+                        <div id="sync-status" class="sync-status">🟡 Checking...</div>
+                    </div>
+                    <div class="header-right">
+                        <div class="date-display">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span id="current-date"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hybrid-controls">
+                    <h3>🔄 Storage Status</h3>
+                    <div class="storage-info">
+                        <div class="storage-card local">
+                            <h4>📱 Local Storage</h4>
+                            <p>✅ Always Active</p>
+                            <p>Instant Access</p>
+                        </div>
+                        <div class="storage-card cloud">
+                            <h4>☁️ Google Sheets</h4>
+                            <p id="cloud-status">🟡 Not Connected</p>
+                            <p id="cloud-info">Click to connect</p>
+                        </div>
+                    </div>
+                    <button id="connect-google" class="btn-primary">
+                        <i class="fas fa-link"></i> Connect Google Sheets
+                    </button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card primary">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-students" class="stat-number">0</h3>
+                            <p class="stat-label">Total Students</p>
+                        </div>
+                    </div>
+                    <div class="stat-card secondary">
+                        <div class="stat-icon">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-desks" class="stat-number">0</h3>
+                            <p class="stat-label">Assigned Desks</p>
+                        </div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-icon">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-revenue" class="stat-number">₹0</h3>
+                            <p class="stat-label">Total Revenue</p>
+                        </div>
+                    </div>
+                    <div class="stat-card accent">
+                        <div class="stat-icon">
+                            <i class="fas fa-tag"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="desk-charge" class="stat-number">₹500</h3>
+                            <p class="stat-label">Desk Charge</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-section">
+                    <div class="section-header">
+                        <h3>Recent Students</h3>
+                        <button class="btn-view-all" onclick="hybrid.switchPage('students')">
+                            View All <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div id="recent-students" class="recent-list">
+                        <!-- Recent students will be displayed here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Students Page -->
+            <section id="students" class="page">
+                <div class="page-header">
+                    <div class="header-left">
+                        <h2 class="page-title">Student Directory</h2>
+                        <p class="page-subtitle">All registered students</p>
+                    </div>
+                </div>
+                <div id="students-list" class="students-grid">
+                    <!-- Students will be displayed here -->
+                </div>
+            </section>
+
+            <!-- Register Page -->
+            <section id="register" class="page">
+                <div class="page-header">
+                    <div class="header-left">
+                        <h2 class="page-title">Register New Student</h2>
+                        <p class="page-subtitle">Data saved to both local storage and Google Sheets</p>
+                    </div>
+                </div>
+                <div class="form-container">
+                    <form id="student-form" class="modern-form">
+                        <div class="form-section">
+                            <h3 class="section-title">Personal Information</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="student-name">Full Name *</label>
+                                    <input type="text" id="student-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="student-contact">Contact Number *</label>
+                                    <input type="tel" id="student-contact" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="student-email">Email Address *</label>
+                                    <input type="email" id="student-email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="student-address">Address *</label>
+                                    <input type="text" id="student-address" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-section">
+                            <h3 class="section-title">Academic Information</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="field-study">Field of Study *</label>
+                                    <select id="field-study" required>
+                                        <option value="">Select Field</option>
+                                        <option value="Computer Science">Computer Science</option>
+                                        <option value="Engineering">Engineering</option>
+                                        <option value="Medicine">Medicine</option>
+                                        <option value="Business">Business</option>
+                                        <option value="Arts">Arts</option>
+                                        <option value="Science">Science</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="desk-number">Desk Number *</label>
+                                    <input type="text" id="desk-number" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save"></i> Register Student
+                            </button>
+                            <button type="reset" class="btn-secondary">
+                                <i class="fas fa-redo"></i> Reset Form
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Payment Table Page -->
+            <section id="payment-table" class="page">
+                <div class="page-header">
+                    <div class="header-left">
+                        <h2 class="page-title">Payment Dashboard</h2>
+                        <p class="page-subtitle">Latest payment details for all students</p>
+                    </div>
+                    <div class="header-right">
+                        <div class="date-display">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span id="current-date"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-table-container">
+                    <div class="table-header">
+                        <h3>Current Month Payments</h3>
+                        <div class="table-actions">
+                            <button class="btn-primary" onclick="hybrid.updatePaymentTable()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="payment-dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Desk Number</th>
+                                    <th>Latest Payment</th>
+                                    <th>Actions</th>
+                                    <th>History</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payment-table-body">
+                                <!-- Payment data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="no-payment-data" class="no-data">
+                        <div class="no-data-icon">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <h3>No Payment Data</h3>
+                        <p>No students have been registered yet. Start by registering students to manage payments.</p>
+                        <button class="btn-primary" onclick="hybrid.switchPage('register')">
+                            <i class="fas fa-user-plus"></i> Register First Student
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Page -->
+            <section id="admin" class="page">
+                <div class="page-header">
+                    <div class="header-left">
+                        <h2 class="page-title">Admin Panel</h2>
+                        <p class="page-subtitle">System management and data export</p>
+                    </div>
+                </div>
+                <div class="admin-grid">
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <i class="fas fa-download"></i>
+                            <h3>Data Export</h3>
+                        </div>
+                        <div class="admin-actions">
+                            <button id="export-data" class="btn-primary">
+                                <i class="fas fa-file-pdf"></i> Export Data (PDF/JSON)
+                            </button>
+                            <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.875rem;">
+                                Export your complete student data in PDF table format or JSON format. PDF includes professional tables with current month payment summary.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <i class="fas fa-sync"></i>
+                            <h3>Sync Status</h3>
+                        </div>
+                        <div class="system-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Total Students:</span>
+                                <span id="admin-total-students" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Local Storage:</span>
+                                <span class="stat-value">✅ Active</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Google Sheets:</span>
+                                <span id="google-sheets-status" class="stat-value">🟡 Not Connected</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Success/Error Messages -->
+    <div id="message" class="message"></div>
+
+    <!-- JavaScript -->
+    <script src="hybrid-script.js"></script>
+</body>
+</html>
